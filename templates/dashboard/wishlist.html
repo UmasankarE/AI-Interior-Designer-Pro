@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}My Wishlist - AI Interior Designer Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold"><i class="fas fa-heart"></i> My Wishlist</h2>
+            <p class="text-muted">Your saved favorite designs</p>
+        </div>
+    </div>
+
+    {% if wishlists.items %}
+    <div class="row g-4">
+        {% for wishlist in wishlists.items %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 hover-lift">
+                <div class="position-relative overflow-hidden" style="height: 250px;">
+                    <img src="{{ wishlist.design.image_url }}" alt="{{ wishlist.design.title }}" class="img-fluid w-100 h-100 object-fit-cover">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title mb-2">{{ wishlist.design.title }}</h5>
+                    <p class="text-muted small mb-3">{{ wishlist.design.room_type }} - {{ wishlist.design.style }}</p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-primary">₹{{ wishlist.design.price }}</span>
+                        <small class="text-muted">{{ wishlist.created_at.strftime('%b %d') }}</small>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('design.detail', design_id=wishlist.design.id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        <button class="btn btn-outline-danger btn-sm remove-wishlist" data-id="{{ wishlist.id }}">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if wishlists.pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if wishlists.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('dashboard.wishlist', page=wishlists.prev_num) }}">Previous</a>
+            </li>
+            {% endif %}
+            {% for page_num in wishlists.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num == wishlists.page %}
+                    <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('dashboard.wishlist', page=page_num) }}">{{ page_num }}</a></li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if wishlists.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('dashboard.wishlist', page=wishlists.next_num) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-heart fa-5x text-muted mb-3"></i>
+        <h4>Your wishlist is empty</h4>
+        <p class="text-muted mb-4">Start adding your favorite designs!</p>
+        <a href="{{ url_for('gallery.index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-images"></i> Explore Gallery
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

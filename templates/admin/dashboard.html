@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - AI Interior Designer Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold">Admin Dashboard</h2>
+            <p class="text-muted">Manage your application</p>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3" data-aos="fade-up">
+            <div class="card border-0 shadow-sm rounded-4 bg-gradient-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="card-text text-white-50 mb-2">Total Users</p>
+                            <h3 class="fw-bold">{{ total_users }}</h3>
+                        </div>
+                        <i class="fas fa-users fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="card border-0 shadow-sm rounded-4 bg-gradient-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="card-text text-white-50 mb-2">Total Designs</p>
+                            <h3 class="fw-bold">{{ total_designs }}</h3>
+                        </div>
+                        <i class="fas fa-image fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+            <div class="card border-0 shadow-sm rounded-4 bg-gradient-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="card-text text-white-50 mb-2">Total Bookings</p>
+                            <h3 class="fw-bold">{{ total_bookings }}</h3>
+                        </div>
+                        <i class="fas fa-calendar fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+            <div class="card border-0 shadow-sm rounded-4 bg-gradient-danger text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="card-text text-white-50 mb-2">Total Reviews</p>
+                            <h3 class="fw-bold">{{ total_reviews }}</h3>
+                        </div>
+                        <i class="fas fa-star fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4">
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.manage_users') }}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark hover-lift h-100">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                    <h6>Manage Users</h6>
+                    <small class="text-muted">Edit user accounts</small>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.manage_designs') }}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark hover-lift h-100">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-image fa-2x text-success mb-3"></i>
+                    <h6>Manage Designs</h6>
+                    <small class="text-muted">Upload & edit designs</small>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.manage_categories') }}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark hover-lift h-100">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-list fa-2x text-warning mb-3"></i>
+                    <h6>Manage Categories</h6>
+                    <small class="text-muted">Create categories</small>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('admin.manage_reviews') }}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark hover-lift h-100">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-comments fa-2x text-danger mb-3"></i>
+                    <h6>Manage Reviews</h6>
+                    <small class="text-muted">Moderate reviews</small>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings - AI Interior Designer Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold"><i class="fas fa-calendar"></i> My Bookings</h2>
+            <p class="text-muted">Your design consultations and bookings</p>
+        </div>
+    </div>
+
+    {% if bookings.items %}
+    <div class="row g-4">
+        {% for booking in bookings.items %}
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm rounded-4 hover-lift">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="{{ booking.design.image_url }}" alt="{{ booking.design.title }}" class="img-fluid rounded-3" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title mb-1">{{ booking.design.title }}</h5>
+                                    <p class="text-muted mb-2">{{ booking.design.room_type }} - {{ booking.design.style }}</p>
+                                </div>
+                                <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' if booking.status == 'pending' else 'danger' if booking.status == 'cancelled' else 'info' }}">
+                                    {{ booking.status.upper() }}
+                                </span>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Booking Date</h6>
+                                    <p class="fw-500">{{ booking.booking_date.strftime('%B %d, %Y') }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Total Cost</h6>
+                                    <p class="fw-500 text-primary">₹{{ booking.total_cost }}</p>
+                                </div>
+                            </div>
+
+                            {% if booking.description %}
+                            <div class="mb-3">
+                                <h6 class="text-muted">Description</h6>
+                                <p>{{ booking.description }}</p>
+                            </div>
+                            {% endif %}
+
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('design.detail', design_id=booking.design.id) }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye"></i> View Design
+                                </a>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-phone"></i> Contact Designer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if bookings.pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if bookings.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('dashboard.bookings', page=bookings.prev_num) }}">Previous</a>
+            </li>
+            {% endif %}
+            {% for page_num in bookings.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num == bookings.page %}
+                    <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('dashboard.bookings', page=page_num) }}">{{ page_num }}</a></li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if bookings.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('dashboard.bookings', page=bookings.next_num) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-calendar fa-5x text-muted mb-3"></i>
+        <h4>No bookings yet</h4>
+        <p class="text-muted mb-4">Book a design consultation with our experts!</p>
+        <a href="{{ url_for('gallery.index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-images"></i> Browse Designs
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - AI Interior Designer Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold">Welcome, {{ current_user.username }}!</h2>
+            <p class="text-muted">Here's your dashboard overview</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3" data-aos="fade-up">
+            <div class="card border-0 shadow-sm rounded-4 bg-gradient-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="card-text text-white-50 mb-2">Wishlist Items</p>
+                            <h3 class="fw-bold">{{ wishlist_count }}</h3>
+                        </div>
+                        <i class="fas fa-heart fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="card border-0 shadow-sm rounded-4 bg-gradient-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="card-text text-white-50 mb-2">Bookings</p>
+                            <h3 class="fw-bold">{{ bookings_count }}</h3>
+                        </div>
+                        <i class="fas fa-calendar fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+            <div class="card border-0 shadow-sm rounded-4 bg-gradient-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="card-text text-white-50 mb-2">Generated Images</p>
+                            <h3 class="fw-bold">{{ generated_images_count }}</h3>
+                        </div>
+                        <i class="fas fa-image fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+            <div class="card border-0 shadow-sm rounded-4 bg-gradient-danger text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="card-text text-white-50 mb-2">Notifications</p>
+                            <h3 class="fw-bold">{{ notifications|length }}</h3>
+                        </div>
+                        <i class="fas fa-bell fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row g-4">
+        <!-- Recent Activities -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header border-0 bg-white rounded-top-4">
+                    <h6 class="card-title mb-0"><i class="fas fa-history"></i> Recent Activities</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% for wishlist in recent_wishlists %}
+                        <li class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                            <div class="activity-icon me-3">
+                                <i class="fas fa-heart text-danger fa-2x"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <p class="mb-1"><strong>Added to Wishlist:</strong> {{ wishlist.design.title }}</p>
+                                <small class="text-muted">{{ wishlist.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                            </div>
+                        </li>
+                        {% endfor %}
+                        {% for booking in recent_bookings %}
+                        <li class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                            <div class="activity-icon me-3">
+                                <i class="fas fa-calendar text-success fa-2x"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <p class="mb-1"><strong>Booking Created:</strong> {{ booking.design.title }}</p>
+                                <small class="text-muted">{{ booking.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header border-0 bg-white rounded-top-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0"><i class="fas fa-bell"></i> Notifications</h6>
+                        <a href="{{ url_for('dashboard.notifications') }}" class="small text-decoration-none">View All</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if notifications %}
+                    <ul class="list-unstyled">
+                        {% for notification in notifications %}
+                        <li class="notification-item p-3 mb-2 rounded-3" style="background: #f8f9fa;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ notification.title }}</h6>
+                                    <small class="text-muted">{{ notification.message }}</small>
+                                </div>
+                                <span class="badge bg-{{ notification.notification_type }}"></span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No notifications yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mt-4">
+        <div class="col-md-3">
+            <a href="{{ url_for('gallery.index') }}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark hover-lift h-100">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-images fa-2x text-primary mb-3"></i>
+                    <h6>Explore Gallery</h6>
+                    <small class="text-muted">Browse design ideas</small>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('recommendations.index') }}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark hover-lift h-100">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-magic fa-2x text-success mb-3"></i>
+                    <h6>Get Recommendations</h6>
+                    <small class="text-muted">AI-powered suggestions</small>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('recommendations.cost_estimation') }}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark hover-lift h-100">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-calculator fa-2x text-warning mb-3"></i>
+                    <h6>Cost Estimation</h6>
+                    <small class="text-muted">Calculate project cost</small>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('dashboard.profile') }}" class="card border-0 shadow-sm rounded-4 text-decoration-none text-dark hover-lift h-100">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-user fa-2x text-danger mb-3"></i>
+                    <h6>Edit Profile</h6>
+                    <small class="text-muted">Update your details</small>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

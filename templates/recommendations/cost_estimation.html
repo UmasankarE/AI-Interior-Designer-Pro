@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Cost Estimation - AI Interior Designer Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col">
+            <h2 class="fw-bold mb-2">Cost Estimation Calculator</h2>
+            <p class="text-muted">Calculate accurate costs for your interior design project</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Form -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-body p-4">
+                    <form id="costForm">
+                        <div class="mb-4">
+                            <label class="form-label fw-600">Room Size (Sq. Ft.)</label>
+                            <input type="number" class="form-control" name="room_size" placeholder="e.g., 400" step="10">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-600">Material Type</label>
+                            <select class="form-select" name="material">
+                                <option value="">Select material...</option>
+                                <option value="Basic">Basic</option>
+                                <option value="Premium">Premium</option>
+                                <option value="Luxury">Luxury</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-600">Electrical Work (₹)</label>
+                            <input type="number" class="form-control" name="electrical" placeholder="e.g., 15000" step="1000">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-600">Painting (₹)</label>
+                            <input type="number" class="form-control" name="painting" placeholder="e.g., 10000" step="1000">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-600">Labour (₹)</label>
+                            <input type="number" class="form-control" name="labour" placeholder="e.g., 20000" step="1000">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-600">Tax (%)</label>
+                            <input type="number" class="form-control" name="tax" placeholder="e.g., 18" min="0" max="100" step="0.1">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-600">Discount (%)</label>
+                            <input type="number" class="form-control" name="discount" placeholder="e.g., 10" min="0" max="100" step="0.1">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-calculator"></i> Calculate Cost
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4" id="resultCard" style="display: none;">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">Cost Breakdown</h5>
+                    
+                    <div class="cost-item mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Material Cost</span>
+                            <strong id="materialCost">₹0</strong>
+                        </div>
+                    </div>
+
+                    <div class="cost-item mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Labour Cost</span>
+                            <strong id="labourCost">₹0</strong>
+                        </div>
+                    </div>
+
+                    <div class="cost-item mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Electrical</span>
+                            <strong id="electricalCost">₹0</strong>
+                        </div>
+                    </div>
+
+                    <div class="cost-item mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Painting</span>
+                            <strong id="paintingCost">₹0</strong>
+                        </div>
+                    </div>
+
+                    <div class="cost-item mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax</span>
+                            <strong id="taxCost">₹0</strong>
+                        </div>
+                    </div>
+
+                    <div class="cost-item mb-4 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Discount</span>
+                            <strong id="discountCost" class="text-success">-₹0</strong>
+                        </div>
+                    </div>
+
+                    <div class="cost-item total p-3 rounded-3 bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-600">Total Cost</span>
+                            <h4 class="mb-0" id="totalCost">₹0</h4>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-outline-primary w-100 mt-4">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+
+            <div id="emptyState" class="text-center py-5">
+                <i class="fas fa-calculator fa-5x text-muted mb-3"></i>
+                <p class="text-muted">Enter the details and click calculate to see the cost breakdown</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('costForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        const response = await fetch('{{ url_for("recommendations.cost_estimation") }}', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.total_cost !== undefined) {
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultCard').style.display = 'block';
+            
+            document.getElementById('materialCost').textContent = '₹' + data.breakdown.material;
+            document.getElementById('labourCost').textContent = '₹' + data.breakdown.labour;
+            document.getElementById('electricalCost').textContent = '₹' + data.breakdown.electrical;
+            document.getElementById('paintingCost').textContent = '₹' + data.breakdown.painting;
+            document.getElementById('taxCost').textContent = '₹' + Math.round(data.breakdown.tax);
+            document.getElementById('discountCost').textContent = '-₹' + Math.round(data.breakdown.discount);
+            document.getElementById('totalCost').textContent = '₹' + Math.round(data.total_cost);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Recommendations - AI Interior Designer Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col">
+            <h2 class="fw-bold mb-2">AI-Powered Recommendations</h2>
+            <p class="text-muted">Get personalized interior design recommendations based on your preferences</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-body p-5">
+                    <form method="POST" action="{{ url_for('recommendations.get_recommendations') }}" id="recommendationForm">
+                        <!-- Room Type -->
+                        <div class="mb-4">
+                            <label class="form-label fw-600 mb-3">Room Type</label>
+                            <div class="d-grid gap-2 grid-cols-2">
+                                {% for room in ['Living Room', 'Bedroom', 'Kitchen', 'Bathroom', 'Office', 'Dining Room'] %}
+                                <label class="room-option">
+                                    <input type="radio" name="room_type" value="{{ room }}" required>
+                                    <span class="option-label">{{ room }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Budget -->
+                        <div class="mb-4">
+                            <label class="form-label fw-600 mb-3">Budget</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="range" class="form-range flex-grow-1" id="budgetRange" 
+                                       name="budget" min="10000" max="1000000" step="10000" value="50000">
+                                <span class="badge bg-primary px-3 py-2">₹<span id="budgetValue">50000</span></span>
+                            </div>
+                        </div>
+
+                        <!-- Colour Preference -->
+                        <div class="mb-4">
+                            <label class="form-label fw-600 mb-3">Colour Preference</label>
+                            <div class="d-flex gap-2 flex-wrap">
+                                {% for color in ['White', 'Black', 'Blue', 'Green', 'Yellow', 'Orange', 'Red', 'Purple'] %}
+                                <label class="color-option">
+                                    <input type="checkbox" name="colour" value="{{ color }}">
+                                    <span class="option-badge">{{ color }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Style -->
+                        <div class="mb-4">
+                            <label class="form-label fw-600 mb-3">Style</label>
+                            <div class="d-flex gap-2 flex-wrap">
+                                {% for style in ['Modern', 'Minimal', 'Luxury', 'Rustic', 'Industrial', 'Contemporary'] %}
+                                <label class="style-option">
+                                    <input type="radio" name="style" value="{{ style }}" required>
+                                    <span class="option-badge">{{ style }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Furniture Type -->
+                        <div class="mb-4">
+                            <label class="form-label fw-600 mb-3">Furniture Type</label>
+                            <select class="form-select" name="furniture_type" required>
+                                <option value="">Select furniture type...</option>
+                                <option value="Wood">Wood</option>
+                                <option value="Metal">Metal</option>
+                                <option value="Leather">Leather</option>
+                                <option value="Fabric">Fabric</option>
+                                <option value="Glass">Glass</option>
+                            </select>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-wand-magic-sparkles"></i> Get Recommendations
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Budget slider
+    const budgetRange = document.getElementById('budgetRange');
+    const budgetValue = document.getElementById('budgetValue');
+    
+    budgetRange.addEventListener('input', function() {
+        budgetValue.textContent = new Intl.NumberFormat('en-IN').format(this.value);
+    });
+</script>
+{% endblock %}

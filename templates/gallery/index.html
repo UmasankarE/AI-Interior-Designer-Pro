@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Design Gallery - AI Interior Designer Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-lg-3 bg-light p-4">
+            <h5 class="mb-4"><i class="fas fa-filter"></i> Filter</h5>
+
+            <!-- Search -->
+            <div class="mb-4">
+                <label class="form-label fw-500">Search</label>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search designs...">
+            </div>
+
+            <!-- Category -->
+            <div class="mb-4">
+                <label class="form-label fw-500">Category</label>
+                <div class="list-group">
+                    <a href="{{ url_for('gallery.index') }}" class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
+                        All Categories
+                    </a>
+                    {% for category in categories %}
+                    <a href="{{ url_for('gallery.index', category=category.id) }}" 
+                       class="list-group-item list-group-item-action {% if current_category == category.id|string %}active{% endif %}">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Style -->
+            <div class="mb-4">
+                <label class="form-label fw-500">Style</label>
+                <select class="form-select" id="styleFilter">
+                    <option value="">All Styles</option>
+                    {% for style in styles %}
+                    <option value="{{ style }}">{{ style }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Room Type -->
+            <div class="mb-4">
+                <label class="form-label fw-500">Room Type</label>
+                <select class="form-select" id="roomTypeFilter">
+                    <option value="">All Rooms</option>
+                    {% for room in room_types %}
+                    <option value="{{ room }}">{{ room }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Sort -->
+            <div class="mb-4">
+                <label class="form-label fw-500">Sort By</label>
+                <select class="form-select" id="sortFilter">
+                    <option value="recent" {% if current_sort == 'recent' %}selected{% endif %}>Recent</option>
+                    <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Popular</option>
+                    <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>Top Rated</option>
+                    <option value="price_low" {% if current_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if current_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary w-100" id="applyFilters">
+                <i class="fas fa-check"></i> Apply Filters
+            </button>
+        </div>
+
+        <!-- Gallery -->
+        <div class="col-lg-9 p-4">
+            <div class="row mb-4 align-items-center">
+                <div class="col">
+                    <h3 class="fw-bold">Design Gallery</h3>
+                </div>
+                <div class="col-auto">
+                    <span class="badge bg-primary">{{ designs.total }} designs</span>
+                </div>
+            </div>
+
+            <!-- Designs Grid -->
+            <div class="row g-4">
+                {% for design in designs.items %}
+                <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                    <div class="design-card rounded-3 overflow-hidden shadow-sm h-100 border-0 hover-lift">
+                        <div class="design-image position-relative overflow-hidden" style="height: 250px;">
+                            <img src="{{ design.image_url }}" alt="{{ design.title }}" class="img-fluid w-100 h-100 object-fit-cover">
+                            <div class="overlay position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center opacity-0 hover-opacity-100 transition">
+                                <a href="{{ url_for('design.detail', design_id=design.id) }}" class="btn btn-primary">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <h6 class="mb-2">{{ design.title }}</h6>
+                            <p class="text-muted small mb-3">{{ design.room_type }} - {{ design.style }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">₹{{ design.price|default('N/A') }}</span>
+                                <button class="btn btn-sm btn-outline-danger like-btn" data-design-id="{{ design.id }}">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if designs.pages > 1 %}
+            <nav aria-label="Page navigation" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if designs.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('gallery.index', page=designs.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in designs.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num == designs.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('gallery.index', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if designs.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('gallery.index', page=designs.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Like button functionality
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const designId = this.dataset.designId;
+            fetch(`{{ url_for('gallery.like_design', design_id=0) }}`.replace('0', designId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    this.classList.toggle('text-danger');
+                }
+            });
+        });
+    });
+
+    // Apply filters
+    document.getElementById('applyFilters').addEventListener('click', function() {
+        const params = new URLSearchParams();
+        const search = document.getElementById('searchInput').value;
+        const style = document.getElementById('styleFilter').value;
+        const room = document.getElementById('roomTypeFilter').value;
+        const sort = document.getElementById('sortFilter').value;
+
+        if (search) params.append('search', search);
+        if (style) params.append('style', style);
+        if (room) params.append('room_type', room);
+        if (sort) params.append('sort', sort);
+
+        window.location.href = '{{ url_for("gallery.index") }}?' + params.toString();
+    });
+</script>
+{% endblock %}
